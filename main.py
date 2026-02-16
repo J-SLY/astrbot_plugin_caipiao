@@ -9,7 +9,7 @@ from datetime import datetime, date
 class MyPlugin(Star):
     def __init__(self, context: Context,config: dict = None):
         super().__init__(context)
-        
+        self.config = config or {}
 
 
     async def initialize(self):
