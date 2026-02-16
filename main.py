@@ -10,29 +10,11 @@ from astrbot.core.star.config import put_config
 class MyPlugin(Star):
     def __init__(self, context: Context, config: AstrBotConfig):
         super().__init__(context)
-        self.config = config
-        self._init_config()
+        
 
 
     async def initialize(self):
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
-    def _init_config(self):
-        """注册后台配置项"""
-        put_config(
-            namespace="astrbot_plugin_caipiao",
-            name="彩票功能开启开关",
-            key="auto_sign_enabled",
-            value=True,
-            description="开启彩票功能"
-        )
-        put_config(
-            namespace="astrbot_plugin_caipiao",
-            name="彩票开奖时间（小时）",
-            key="auto_sign_hour",
-            value=20,
-            description="彩票开奖的时间，默认20点"
-        )
-
 
     @filter.command_group("vc")
     def vc(self):
