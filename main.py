@@ -7,9 +7,8 @@ from datetime import datetime, date
 
 @register("caipiao", "J-SLY", "一个虚拟货币系统", "1.0.0")
 class MyPlugin(Star):
-    def __init__(self, context: Context,config: dict = None):
+    def __init__(self, context: Context):
         super().__init__(context)
-        self.config = config or {}
 
 
     async def initialize(self):
