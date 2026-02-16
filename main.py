@@ -2,13 +2,10 @@ from astrbot.api.event import filter, AstrMessageEvent, MessageEventResult
 from astrbot.api.star import Context, Star, register
 from astrbot.api import logger
 from astrbot.api.message_components import Node,Plain
-from datetime import datetime
-from astrbot.api import logger, AstrBotConfig
 from astrbot.api.event import AstrMessageEvent, filter, MessageChain
-from astrbot.core.star.config import put_config
 @register("caipiao", "J-SLY", "一个虚拟货币系统", "1.0.0")
 class MyPlugin(Star):
-    def __init__(self, context: Context, config: AstrBotConfig):
+    def __init__(self, context: Context):
         super().__init__(context)
         
 
