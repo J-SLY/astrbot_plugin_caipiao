@@ -3,6 +3,8 @@ from astrbot.api.star import Context, Star, register
 from astrbot.api import logger
 from astrbot.api.message_components import Node,Plain
 from astrbot.api.event import AstrMessageEvent, filter, MessageChain
+from datetime import datetime, date
+
 @register("caipiao", "J-SLY", "一个虚拟货币系统", "1.0.0")
 class MyPlugin(Star):
     def __init__(self, context: Context):
@@ -12,6 +14,15 @@ class MyPlugin(Star):
 
     async def initialize(self):
         """可选择实现异步的插件初始化方法，当实例化该插件类之后会自动调用该方法。"""
+
+    async def check_qd_num(self,user_id:str):
+        key:str=f"is_{user_id}_qd_today"
+        today=date.today().isoformat()
+        last_use=await self.get_kv_data(key,False)
+        if today==last_use:
+            return False
+        else:
+            return True
 
     @filter.command_group("vc")
     def vc(self):
@@ -80,6 +91,18 @@ class MyPlugin(Star):
                 await self.put_kv_data(f"{goal}_money",goal_money_int+money)
                 await self.put_kv_data(f"{user_id}_money",user_money_int-money)
                 yield event.plain_result(f"转账成功，您账户余额剩余{user_money_int-money}")
-
+    @vc.command("qd",alias={'签到'})
+    async def qd(self,event:AstrMessageEvent):
+        rg_key=f"is_{event.get_sender_id()}_rg"
+        if await self.get_kv_data(rg_key,False)==False:
+            yield event.plain_result("您未注册！请使用/vc rg进行注册")
+        else:
+            if await self.check_qd_num(user_id=event.get_sender_id())==True:
+                money_str=str(self.get_kv_data(f"{event.get_sender_id()}_money",False))
+                money_int=int(money_str)
+                await self.put_kv_data(f"{event.get_sender_id()}_money",money_int+1000)
+                yield event.plain_result("签到成功，余额+1000")
+            else:
+                yield event.plain_result("您今天已经签到")
     async def terminate(self):
         """可选择实现异步的插件销毁方法，当插件被卸载/停用时会调用。"""
