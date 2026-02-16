@@ -7,7 +7,7 @@ from datetime import datetime, date
 
 @register("caipiao", "J-SLY", "一个虚拟货币系统", "1.0.0")
 class MyPlugin(Star):
-    def __init__(self, context: Context):
+    def __init__(self, context: Context,config: dict = None):
         super().__init__(context)
         
 
@@ -60,9 +60,9 @@ class MyPlugin(Star):
             yield event.chain_result([person_info])
     @vc.command("to",alias={'转账'})
     async def to(self,event:AstrMessageEvent,goal:str,money:int):
-        user_id=event.get_sender_id
+        user_id=event.get_sender_id()
         to_id=goal
-        if await self.get_kv_data(f"is_{user_id}_rg",False):
+        if await self.get_kv_data(f"is_{user_id}_rg",False)==False:
             yield event.plain_result(f"{user_id}未注册，请使用/vc rg注册")
         elif await self.get_kv_data(f"is_{to_id}_rg",False):
             yield event.plain_result(f"{to_id}未注册，请提醒对方使用/vc rg注册")
@@ -85,7 +85,7 @@ class MyPlugin(Star):
             yield event.plain_result("您未注册！请使用/vc rg进行注册")
         else:
             if await self.check_qd_num(user_id=event.get_sender_id())==True:
-                money_str=str(self.get_kv_data(f"{event.get_sender_id()}_money",False))
+                money_str=str(await self.get_kv_data(f"{event.get_sender_id()}_money",False))
                 money_int=int(money_str)
                 await self.put_kv_data(f"{event.get_sender_id()}_money",money_int+1000)
                 yield event.plain_result("签到成功，余额+1000")
