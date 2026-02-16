@@ -31,7 +31,7 @@ class MyPlugin(Star):
     async def help(self, event: AstrMessageEvent):
         help_text=Node(
             content=[
-                Plain("帮助文档：\n\n /vc help /vc 帮助 ：输出本帮助列表\n")
+                Plain("帮助文档：\n\n /vc help /vc 帮助 ：输出本帮助列表\n/vc rg /vc 注册 ：注册用户\n/vc me /vc 个人主页 ：查看余额\n/vc to <目标ID> <转账金额> /vc 转账 <目标ID> <转账金额> ：向指定ID账户转账指定金额\n/vc qd /vc 签到 ：每日使用一次，余额+1000\n\n管理员指令：\n/vc cg <金额> <目标用户ID> <是否确定>(True)")
             ]
         )
         yield event.chain_result([help_text])
@@ -58,19 +58,6 @@ class MyPlugin(Star):
                 ]
             )
             yield event.chain_result([person_info])
-    @filter.permission_type(filter.PermissionType.ADMIN)
-    @vc.command("cg")
-    async def cg(self,event:AstrMessageEvent,money:str,id:str,IsReal:bool=False):
-        if IsReal==False:
-            yield event.plain_result("请确认ID和金额后重新调用该指令")
-        else:
-            user_id=event.get_sender_id()
-            if await self.get_kv_data(f"{user_id}_money",False)==False:
-                yield event.plain_result(f"{user_id}用户不存在")
-            else:
-                last=await self.get_kv_data(f"{user_id}_money",False)
-                await self.put_kv_data(f"{user_id}_money",money)
-                yield event.plain_result(f"{user_id}的余额已由{last}改变为{money}")
     @vc.command("to",alias={'转账'})
     async def to(self,event:AstrMessageEvent,goal:str,money:int):
         user_id=event.get_sender_id
@@ -104,5 +91,18 @@ class MyPlugin(Star):
                 yield event.plain_result("签到成功，余额+1000")
             else:
                 yield event.plain_result("您今天已经签到")
+    @filter.permission_type(filter.PermissionType.ADMIN)
+    @vc.command("cg")
+    async def cg(self,event:AstrMessageEvent,money:str,id:str,IsReal:bool=False):
+        if IsReal==False:
+            yield event.plain_result("请确认ID和金额后重新调用该指令")
+        else:
+            user_id=id
+            if await self.get_kv_data(f"{user_id}_money",False)==False:
+                yield event.plain_result(f"{user_id}用户不存在")
+            else:
+                last=await self.get_kv_data(f"{user_id}_money",False)
+                await self.put_kv_data(f"{user_id}_money",money)
+                yield event.plain_result(f"{user_id}的余额已由{last}改变为{money}")
     async def terminate(self):
         """可选择实现异步的插件销毁方法，当插件被卸载/停用时会调用。"""
